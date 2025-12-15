@@ -1,0 +1,27 @@
+# Git ignore file for Inception project
+
+# Environment files with sensitive data
+srcs/.env
+
+# Secrets directory
+secrets/
+
+# Data directories
+data/
+
+# Docker volumes
+*.vol
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
