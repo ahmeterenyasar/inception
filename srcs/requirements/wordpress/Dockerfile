@@ -1,6 +1,8 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y \
+# Install PHP-FPM, PHP extensions, and required tools, clean up apt cache
+RUN apt-get update && \
+    apt-get install -y \
     php7.4-fpm \
     php7.4-mysql \
     php7.4-curl \
@@ -11,8 +13,8 @@ RUN apt-get update && apt-get install -y \
     php7.4-zip \
     php7.4-intl \
     curl \
-    mariadb-client \
-    && rm -rf /var/lib/apt/lists/*
+    mariadb-client && \
+    rm -rf /var/lib/apt/lists/*
 
 # Configure PHP-FPM to listen on port 9000
 RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/g' /etc/php/7.4/fpm/pool.d/www.conf && \
@@ -21,12 +23,13 @@ RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/g' /etc/php/7.4
 # Create directory for PHP-FPM
 RUN mkdir -p /run/php
 
-# Copy setup script
-COPY tools/setup.sh /tmp/setup.sh
-RUN chmod +x /tmp/setup.sh
+# Copy entrypoint script
+COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /var/www/html
 
 EXPOSE 9000
 
-ENTRYPOINT ["/tmp/setup.sh"]
+# Start WordPress via entrypoint
+CMD ["/usr/local/bin/entrypoint.sh"]

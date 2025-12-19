@@ -1,27 +1,24 @@
 FROM debian:bullseye
 
-RUN apt-get update && apt-get install -y \
-    nginx \
-    openssl \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Install NGINX and OpenSSL for self-signed certificates and clean up apt cache
+RUN apt-get update && \
+    apt-get install -y nginx openssl && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create directory for SSL certificates
-RUN mkdir -p /etc/nginx/ssl
+# Create necessary directories
+RUN mkdir -p /var/www/html && \
+    mkdir -p /etc/nginx/ssl && \
+    mkdir -p /var/log/nginx
 
-# Copy nginx configuration
+# Copy NGINX configuration
 COPY conf/nginx.conf /etc/nginx/nginx.conf
 
-# Copy SSL generation script
-COPY tools/setup.sh /tmp/setup.sh
-RUN chmod +x /tmp/setup.sh
+# Copy entrypoint script
+COPY tools/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Generate self-signed SSL certificate
-RUN /tmp/setup.sh
-
-# Create directory for PID file
-RUN mkdir -p /run/nginx
-
+# Expose HTTPS port only (as required by subject)
 EXPOSE 443
 
-CMD ["nginx", "-g", "daemon off;"]
+# Start NGINX via entrypoint
+CMD ["/usr/local/bin/entrypoint.sh"]

@@ -4,13 +4,14 @@ set -e
 
 # Wait for MariaDB to be ready
 echo "[WordPress] Waiting for MariaDB to be ready..."
+sleep 10
 for i in {1..30}; do
     if mysql -h mariadb -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1" &>/dev/null; then
         echo "[WordPress] MariaDB is ready!"
         break
     fi
     echo "[WordPress] Waiting for MariaDB... ($i/30)"
-    sleep 2
+    sleep 3
 done
 
 # Verify connection one more time
