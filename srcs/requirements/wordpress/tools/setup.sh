@@ -1,12 +1,23 @@
 #!/bin/bash
 
+set -e
+
 # Wait for MariaDB to be ready
-echo "Waiting for MariaDB to be ready..."
-until mysqladmin ping -h"mariadb" -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" --silent; do
-    echo "MariaDB is unavailable - sleeping"
+echo "[WordPress] Waiting for MariaDB to be ready..."
+for i in {1..30}; do
+    if mysql -h mariadb -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1" &>/dev/null; then
+        echo "[WordPress] MariaDB is ready!"
+        break
+    fi
+    echo "[WordPress] Waiting for MariaDB... ($i/30)"
     sleep 2
 done
-echo "MariaDB is up and running!"
+
+# Verify connection one more time
+if ! mysql -h mariadb -u"${MYSQL_USER}" -p"${MYSQL_PASSWORD}" -e "SELECT 1" &>/dev/null; then
+    echo "[WordPress] ERROR: Could not connect to MariaDB!"
+    exit 1
+fi
 
 # Install WordPress if not already installed
 if [ ! -f "/var/www/html/wp-config.php" ]; then
@@ -20,14 +31,46 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
     # Download WordPress core
     wp core download --allow-root --path=/var/www/html
     
-    # Create WordPress configuration
-    wp config create \
-        --allow-root \
-        --dbname="${MYSQL_DATABASE}" \
-        --dbuser="${MYSQL_USER}" \
-        --dbpass="${MYSQL_PASSWORD}" \
-        --dbhost="mariadb:3306" \
-        --path=/var/www/html
+    # Create wp-config.php manually
+    echo "Creating wp-config.php..."
+    cat > /var/www/html/wp-config.php << 'WPCONFIG'
+<?php
+/**
+ * The base configuration for WordPress
+ */
+
+// ** Database settings ** //
+define( 'DB_NAME', getenv('MYSQL_DATABASE') );
+define( 'DB_USER', getenv('MYSQL_USER') );
+define( 'DB_PASSWORD', getenv('MYSQL_PASSWORD') );
+define( 'DB_HOST', 'mariadb:3306' );
+define( 'DB_CHARSET', 'utf8' );
+define( 'DB_COLLATE', '' );
+
+// ** Authentication unique keys and salts ** //
+define('AUTH_KEY',         'put your unique phrase here');
+define('SECURE_AUTH_KEY',  'put your unique phrase here');
+define('LOGGED_IN_KEY',    'put your unique phrase here');
+define('NONCE_KEY',        'put your unique phrase here');
+define('AUTH_SALT',        'put your unique phrase here');
+define('SECURE_AUTH_SALT', 'put your unique phrase here');
+define('LOGGED_IN_SALT',   'put your unique phrase here');
+define('NONCE_SALT',       'put your unique phrase here');
+
+// ** WordPress database table prefix ** //
+$table_prefix = 'wp_';
+
+// ** Debugging ** //
+define( 'WP_DEBUG', false );
+
+// ** Absolute path to WordPress directory ** //
+if ( ! defined( 'ABSPATH' ) ) {
+    define( 'ABSPATH', __DIR__ . '/' );
+}
+
+// ** Sets up WordPress vars and included files ** //
+require_once ABSPATH . 'wp-settings.php';
+WPCONFIG
     
     # Install WordPress
     wp core install \

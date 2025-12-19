@@ -17,32 +17,32 @@ setup:
 # Build all Docker images
 build: setup
 	@echo "Building Docker images..."
-	@docker-compose -f $(COMPOSE_FILE) build
+	@sudo docker-compose -f $(COMPOSE_FILE) build
 	@echo "Build complete."
 
 # Start all containers
 up: setup
 	@echo "Starting containers..."
-	@docker-compose -f $(COMPOSE_FILE) up -d
+	@sudo docker-compose -f $(COMPOSE_FILE) up -d
 	@echo "Containers are up and running."
 	@echo "Access WordPress at: https://ayasar.42.fr"
 
 # Stop all containers
 down:
 	@echo "Stopping containers..."
-	@docker-compose -f $(COMPOSE_FILE) down
+	@sudo docker-compose -f $(COMPOSE_FILE) down
 	@echo "Containers stopped."
 
 # Stop containers and remove images
 clean: down
 	@echo "Removing Docker images..."
-	@docker-compose -f $(COMPOSE_FILE) down --rmi all
+	@sudo docker-compose -f $(COMPOSE_FILE) down --rmi all
 	@echo "Images removed."
 
 # Full clean: remove everything including volumes
 fclean: clean
 	@echo "Removing volumes and data..."
-	@docker-compose -f $(COMPOSE_FILE) down --volumes
+	@sudo docker-compose -f $(COMPOSE_FILE) down --volumes
 	@sudo rm -rf $(DATA_DIR)/mysql/*
 	@sudo rm -rf $(DATA_DIR)/wordpress/*
 	@echo "Full clean complete."
@@ -52,11 +52,11 @@ re: fclean all
 
 # Show logs
 logs:
-	@docker-compose -f $(COMPOSE_FILE) logs -f
+	@sudo docker-compose -f $(COMPOSE_FILE) logs -f
 
 # Show container status
 ps:
-	@docker-compose -f $(COMPOSE_FILE) ps
+	@sudo docker-compose -f $(COMPOSE_FILE) ps
 
 # Help
 help:

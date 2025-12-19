@@ -1,12 +1,11 @@
-version: '3.8'
-
 services:
   mariadb:
     container_name: mariadb
     build:
       context: ./requirements/mariadb
       dockerfile: Dockerfile
-    image: mariadb
+    image: inception_mariadb
+    pull_policy: build
     restart: always
     networks:
       - inception
@@ -19,13 +18,20 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
 
   wordpress:
     container_name: wordpress
     build:
       context: ./requirements/wordpress
       dockerfile: Dockerfile
-    image: wordpress
+    image: inception_wordpress
+    pull_policy: build
     restart: always
     networks:
       - inception
@@ -46,14 +52,22 @@ services:
       WP_USER_EMAIL: ${WP_USER_EMAIL}
       WP_USER_PASSWORD: ${WP_USER_PASSWORD}
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "pidof php-fpm7.4 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
 
   nginx:
     container_name: nginx
     build:
       context: ./requirements/nginx
       dockerfile: Dockerfile
-    image: nginx
+    image: inception_nginx
+    pull_policy: build
     restart: always
     networks:
       - inception
@@ -66,7 +80,14 @@ services:
     ports:
       - "443:443"
     depends_on:
-      - wordpress
+      wordpress:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -k https://localhost:443 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   inception:
