@@ -2,7 +2,7 @@ FROM debian:bullseye
 
 # Install NGINX and OpenSSL for self-signed certificates and clean up apt cache
 RUN apt-get update && \
-    apt-get install -y nginx openssl && \
+    apt-get install -y nginx openssl curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Create necessary directories
