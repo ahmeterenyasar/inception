@@ -18,7 +18,9 @@ RUN apt-get update && \
 
 # Configure PHP-FPM to listen on port 9000
 
-
+# Eski Durum: Varsayılan olarak PHP-FPM, "Unix Socket" üzerinden dinler. Bu, sadece aynı bilgisayar (container) içindeki programların konuşması içindir.
+# Sorun: Senin NGINX sunucun başka bir konteynerde. Başka bir konteynerden socket dosyasına erişemez.
+# Çözüm: Ayarı listen = 9000 olarak değiştiriyoruz. Yani PHP'ye diyoruz ki: "Sen bir ağ kapısı (Port 9000) aç ve oradan gelecek istekleri bekle." Böylece NGINX, TCP/IP üzerinden buraya bağlanabilir.
 RUN sed -i 's/listen = \/run\/php\/php7.4-fpm.sock/listen = 9000/g' /etc/php/7.4/fpm/pool.d/www.conf && \
     sed -i 's/;clear_env = no/clear_env = no/g' /etc/php/7.4/fpm/pool.d/www.conf
 
