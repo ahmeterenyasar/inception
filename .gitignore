@@ -1,13 +1,13 @@
 # Git ignore file for Inception project
 
 # Environment files with sensitive data
-srcs/.env
+# srcs/.env
 
 # Secrets directory
-secrets/
+# secrets/
 
 # Data directories
-data/
+# data/
 
 # Docker volumes
 *.vol
