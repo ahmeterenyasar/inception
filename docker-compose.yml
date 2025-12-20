@@ -1,4 +1,3 @@
-
 services:
   nginx:
     build: ./srcs/requirements/nginx
@@ -17,11 +16,10 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f -k https://localhost:443 || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-
+      interval: 5s # Health check her 5 saniyede bir çalıştırılır
+      timeout: 3s # Her test 3 saniye içinde tamamlanmalı, yoksa başarısız sayılır
+      retries: 5 # Bir container unhealthy kabul edilmeden önce 5 başarısız deneme yapılır
+      start_period: 10s # Container başladıktan sonraki ilk 10 saniye, başarısız health check'ler retry sayısına eklenmez. Container'ın başlangıç süresini verir.
 
   mariadb:
     build: ./srcs/requirements/mariadb

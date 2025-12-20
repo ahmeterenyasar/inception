@@ -29,8 +29,6 @@ if [ ! -f /var/www/html/wp-config.php ]; then
 		--user_pass="${WP_USER_PASSWORD}"
 fi
 
-# data base'e ping at cevap geliyosa kur
-
 chown -R www-data:www-data /var/www/html
 
 exec php-fpm7.4 -F
