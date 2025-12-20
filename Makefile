@@ -1,6 +1,6 @@
 # Inception Makefile
 
-COMPOSE_FILE = srcs/docker-compose.yml
+COMPOSE_FILE = docker-compose.yml
 DATA_DIR = /home/ayasar/data
 
 .PHONY: all up build down clean fclean re logs ps

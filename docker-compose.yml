@@ -1,7 +1,7 @@
 
 services:
   nginx:
-    build: ./requirements/nginx
+    build: ./srcs/requirements/nginx
     container_name: nginx
     restart: always
     ports:
@@ -16,7 +16,7 @@ services:
       - wordpress
 
   mariadb:
-    build: ./requirements/mariadb
+    build: ./srcs/requirements/mariadb
     container_name: mariadb
     restart: always
     volumes:
@@ -30,7 +30,7 @@ services:
       - db_root_password
 
   wordpress:
-    build: ./requirements/wordpress
+    build: ./srcs/requirements/wordpress
     container_name: wordpress
     restart: always
     volumes:
@@ -62,13 +62,13 @@ volumes:
 
 secrets:
   db_password:
-    file: ../secrets/db_password.txt
+    file: ./secrets/db_password.txt
   db_root_password:
-    file: ../secrets/db_root_password.txt
+    file: ./secrets/db_root_password.txt
   wp_admin_password:
-    file: ../secrets/wp_admin_password.txt
+    file: ./secrets/wp_admin_password.txt
   wp_user_password:
-    file: ../secrets/wp_user_password.txt
+    file: ./secrets/wp_user_password.txt
 
 networks:
   inception:
