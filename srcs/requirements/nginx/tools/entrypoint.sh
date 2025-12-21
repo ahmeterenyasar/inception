@@ -4,7 +4,6 @@ set -e
 
 echo "[NGINX] Starting entrypoint..."
 
-# Generate self-signed SSL certificate if it doesn't exist
 if [ ! -f "/etc/nginx/ssl/nginx.crt" ] || [ ! -f "/etc/nginx/ssl/nginx.key" ]; then
     echo "[NGINX] Generating self-signed SSL certificate..."
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
